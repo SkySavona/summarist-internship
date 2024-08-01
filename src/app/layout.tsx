@@ -7,6 +7,9 @@ const roboto = Roboto({ subsets: ["latin"], weight: "400" });
 export const metadata: Metadata = {
   title: "Summarist",
   description: "The Ultimate Reading App",
+  icons: {
+    icon: '/favicon.ico',
+  },
 };
 
 export default function RootLayout({
