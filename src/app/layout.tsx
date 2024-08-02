@@ -1,22 +1,16 @@
-import type { Metadata } from "next";
+import React from "react";
 import { Roboto } from "next/font/google";
 import "./globals.css";
+import 'firebaseui/dist/firebaseui.css';
 
 const roboto = Roboto({ subsets: ["latin"], weight: "400" });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Summarist",
   description: "The Ultimate Reading App",
-  icons: {
-    icon: '/favicon.ico',
-  },
 };
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+const Layout = ({ children }: { children: React.ReactNode }) => {
   return (
     <html lang="en">
       <body className={`${roboto.className} bg-white text-gray-900`}>
@@ -24,4 +18,6 @@ export default function RootLayout({
       </body>
     </html>
   );
-}
+};
+
+export default Layout;
