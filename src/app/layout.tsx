@@ -1,7 +1,6 @@
 import React from "react";
 import { Roboto } from "next/font/google";
 import "./globals.css";
-import 'firebaseui/dist/firebaseui.css';
 
 const roboto = Roboto({ subsets: ["latin"], weight: "400" });
 

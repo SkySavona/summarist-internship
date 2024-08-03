@@ -21,6 +21,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
+  const [resetEmailSent, setResetEmailSent] = useState(false);
 
   useEffect(() => {
     const handleRedirectResult = async () => {
@@ -47,8 +48,11 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           return;
         }
         await createUserWithEmailAndPassword(auth, email, password);
-      } else {
+      } else if (mode === "login") {
         await signInWithEmailAndPassword(auth, email, password);
+      } else if (mode === "forgot") {
+        await handleForgotPassword();
+        return;
       }
       window.location.href = "https://summarist.vercel.app/for-you";
     } catch (error: any) {
@@ -83,15 +87,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
     }
     try {
       await sendPasswordResetEmail(auth, email);
-      alert("Password reset email sent!");
+      setResetEmailSent(true);
     } catch (error: any) {
       setError(error.message);
     }
   };
 
-  const toggleMode = () => {
-    setMode(mode === "login" ? "signup" : "login");
+  const toggleMode = (newMode: "login" | "signup" | "forgot") => {
+    setMode(newMode);
     setError("");
+    setResetEmailSent(false);
   };
 
   if (!isOpen) return null;
@@ -106,10 +111,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
           <IoMdClose size={24} />
         </button>
         <h2 className="text-2xl font-bold mb-6 text-center">
-          {mode === "login" ? "Login to Summarist" : "Sign up for Summarist"}
+          {mode === "login" 
+            ? "Login to Summarist" 
+            : mode === "signup" 
+              ? "Sign up for Summarist"
+              : "Reset Password"}
         </h2>
         <div className="space-y-4">
-          {mode === "login" ? (
+          {mode === "login" && (
             <>
               <button
                 onClick={handleGuestLogin}
@@ -124,7 +133,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
                 <FaGoogle className="mr-2" /> Login with Google
               </button>
             </>
-          ) : (
+          )}
+          {mode === "signup" && (
             <button
               onClick={handleGoogleAuth}
               className="w-full bg-[#032b41] border-gray-300 text-white py-3 rounded-md hover:bg-slate-600 duration-200 flex items-center justify-center transition-colors"
@@ -132,11 +142,13 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               <FaGoogle className="mr-2" /> Sign up with Google
             </button>
           )}
-          <div className="flex items-center">
-            <div className="flex-grow border-t border-gray-300"></div>
-            <span className="px-3 text-gray-500 bg-white">or</span>
-            <div className="flex-grow border-t border-gray-300"></div>
-          </div>
+          {(mode === "login" || mode === "signup") && (
+            <div className="flex items-center">
+              <div className="flex-grow border-t border-gray-300"></div>
+              <span className="px-3 text-gray-500 bg-white">or</span>
+              <div className="flex-grow border-t border-gray-300"></div>
+            </div>
+          )}
           <form onSubmit={handleSubmit} className="space-y-4">
             <input
               type="email"
@@ -146,14 +158,16 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               required
               className="w-full p-3 border border-gray-300 rounded-md"
             />
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              placeholder="Password *"
-              required
-              className="w-full p-3 border border-gray-300 rounded-md"
-            />
+            {mode !== "forgot" && (
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Password *"
+                required
+                className="w-full p-3 border border-gray-300 rounded-md"
+              />
+            )}
             {mode === "signup" && (
               <input
                 type="password"
@@ -165,34 +179,58 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
               />
             )}
             {error && <p className="text-red-500 text-sm">{error}</p>}
+            {mode === "forgot" && resetEmailSent && (
+              <p className="text-green-500 text-sm">Password reset email sent! Please check your inbox.</p>
+            )}
             <button
               type="submit"
               className="w-full bg-green-500 text-[#032b41] py-3 rounded-md hover:bg-green-600 transition-colors duration-200"
             >
-              {mode === "login" ? "Login" : "Sign Up"}
+              {mode === "login" ? "Login" : mode === "signup" ? "Sign Up" : "Reset Password"}
             </button>
           </form>
-          {mode === "login" && (
+          <p className="text-center text-sm text-gray-600">
+            {mode === "login" && (
+              <>
+                Don't have an account?{" "}
+                <button
+                  onClick={() => toggleMode("signup")}
+                  className="text-green-500 hover:underline"
+                >
+                  Sign up
+                </button>
+              </>
+            )}
+            {mode === "signup" && (
+              <>
+                Already have an account?{" "}
+                <button
+                  onClick={() => toggleMode("login")}
+                  className="text-green-500 hover:underline"
+                >
+                  Login
+                </button>
+              </>
+            )}
+            {mode === "forgot" && (
+              <button
+                onClick={() => toggleMode("login")}
+                className="text-green-500 hover:underline"
+              >
+                Back to Login
+              </button>
+            )}
+          </p>
+          {mode !== "forgot" && (
             <p className="text-center text-sm">
               <button
-                onClick={() => setMode("forgot")}
+                onClick={() => toggleMode("forgot")}
                 className="text-green-500 hover:underline"
               >
                 Forgot your password?
               </button>
             </p>
           )}
-          <p className="text-center text-sm text-gray-600">
-            {mode === "login"
-              ? "Don't have an account? "
-              : "Already have an account? "}
-            <button
-              onClick={toggleMode}
-              className="text-green-500 hover:underline"
-            >
-              {mode === "login" ? "Sign up" : "Login"}
-            </button>
-          </p>
         </div>
       </div>
     </div>
