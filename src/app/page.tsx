@@ -4,7 +4,7 @@ import { AiFillFileText, AiFillBulb, AiFillAudio } from "react-icons/ai";
 import { BsStarFill, BsStarHalf } from "react-icons/bs";
 import { BiCrown } from "react-icons/bi";
 import { RiLeafLine } from "react-icons/ri";
-import LoginButton from "@/components/LoginButton";
+import LoginButton from "@/components/auth/LoginButton";
 import React, { useState, useEffect } from "react";
 import { motion } from 'framer-motion';
 import { useInView } from 'react-intersection-observer';

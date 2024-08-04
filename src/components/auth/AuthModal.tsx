@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { auth, googleProvider } from "../firebase/firebase";
+import { auth, googleProvider } from "@/services/firebase";
 import {
   signInWithEmailAndPassword,
   signInWithPopup,
@@ -9,6 +9,7 @@ import {
 } from "firebase/auth";
 import { FaGoogle, FaUser } from "react-icons/fa";
 import { IoMdClose } from "react-icons/io";
+
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -22,13 +23,14 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const [error, setError] = useState("");
   const [mode, setMode] = useState<"login" | "signup" | "forgot">("login");
   const [resetEmailSent, setResetEmailSent] = useState(false);
+  
 
   useEffect(() => {
     const handleRedirectResult = async () => {
       try {
         const result = await getRedirectResult(auth);
         if (result) {
-          window.location.href = "https://summarist.vercel.app/for-you";
+          window.location.href = "/for-you";
         }
       } catch (error: any) {
         setError(error.message);
@@ -54,7 +56,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
         await handleForgotPassword();
         return;
       }
-      window.location.href = "https://summarist.vercel.app/for-you";
+      window.location.href = "/for-you";
     } catch (error: any) {
       setError(error.message);
     }
@@ -63,7 +65,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const handleGoogleAuth = async () => {
     try {
       await signInWithPopup(auth, googleProvider);
-      window.location.href = "https://summarist.vercel.app/for-you";
+      window.location.href = "/for-you";
     } catch (error: any) {
       if (error.code === "auth/popup-closed-by-user") {
         return;
@@ -75,7 +77,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   const handleGuestLogin = () => {
     signInWithEmailAndPassword(auth, "guest@gmail.com", "guest123")
       .then(() => {
-        window.location.href = "https://summarist.vercel.app/for-you";
+        window.location.href = "/for-you";
       })
       .catch((error) => setError(error.message));
   };
@@ -102,8 +104,8 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-      <div className="bg-white p-8 rounded-lg max-w-md w-full relative">
+<div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
+<div className="bg-white p-8 rounded-lg max-w-md w-full relative">
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
@@ -184,7 +186,7 @@ const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose }) => {
             )}
             <button
               type="submit"
-              className="w-full bg-green-500 text-[#032b41] py-3 rounded-md hover:bg-green-600 transition-colors duration-200"
+              className="w-full bg-green-500 text-white py-3 rounded-md hover:bg-green-600 transition-colors duration-200"
             >
               {mode === "login" ? "Login" : mode === "signup" ? "Sign Up" : "Reset Password"}
             </button>
